@@ -1,3 +1,4 @@
+from math import inf
 from pgmpy.models import BayesianNetwork
 from pgmpy.factors.discrete import TabularCPD
 from pgmpy.inference import VariableElimination
@@ -10,7 +11,9 @@ class Bayesian:
 
     # Constructor of the class. It receives the model as a list of lists.
     def __init__(self, model):
-        self.model = model                       
+        self.model = model           
+        model.sort(key=self.sort_modelOne)
+
         self.network = BayesianNetwork()
 
         self.nodes = set()
@@ -21,6 +24,13 @@ class Bayesian:
         self.create_edges()
         self.create_cpds()
         self.create_bayesian()
+
+    # Method that sorts the model.
+    def sort_modelOne(self, x):
+        first_letter = x[0][0] if x[0][0] != '!' else x[0][1]
+        negation = x[0].startswith('!')
+        num_negations = x[0].count('!')
+        return (first_letter, negation, -num_negations)
 
     # Method that creates the nodes of the network.
     def create_nodes(self):
@@ -99,7 +109,6 @@ class Bayesian:
 
             self.cpds.append(TabularCPD(variable=variable, variable_card=variable_card, values=values, evidence=evidence, evidence_card=evidence_card))
 
-
     # Method that creates the network.
     def create_bayesian(self):
         self.network.add_nodes_from(self.nodes)
@@ -107,8 +116,6 @@ class Bayesian:
 
         for cpd in self.cpds:
             self.network.add_cpds(cpd)
-
-        self.network.check_model()
 
     # Method that returns a string with the visual representation of the network.
     def get_string_representation(self):
@@ -138,10 +145,11 @@ class Bayesian:
 
     # Method that returns a probability inference of a node given the evidence.
     def get_inference(self, node, evidence):
-        #replace 0 by 1 and viceversa on evidence
-
+        #use union and marginalization to get the probability of the node given the evidence
         inference = VariableElimination(self.network)
-        return inference.query([node], evidence=evidence)
+        return inference.query(variables=[node], evidence=evidence)
+
+
 
 
 
