@@ -11,7 +11,6 @@ class Bayesian:
 
     # Constructor of the class. It receives the model as a list of lists.
     def __init__(self, model):
-        model.sort(key=self.sort_modelOne)
         self.model = model           
 
         self.network = BayesianNetwork()
@@ -20,26 +19,24 @@ class Bayesian:
         self.edges = []
         self.cpds = []
 
+        self.done = []
+
         self.create_nodes()
         self.create_edges()
         self.create_cpds()
         self.create_bayesian()
 
-    # Method that sorts the model.
-    def sort_modelOne(self, x):
-        first_letter = x[0][0] if x[0][0] != '!' else x[0][1]
-        first_letter = "z" + first_letter if '|' in x[0] else first_letter
-        negation = x[0].startswith('!')
-        secondNegation = x[0].split(" | ")[1][0] == "!" if '|' in x[0] else False
-
-        if negation and secondNegation:
-            return (first_letter, False)
-
-        return (first_letter, negation)
-
     # Method that creates the nodes of the network.
     def create_nodes(self):
-        for item in self.model:
+        for node in self.model[0]:
+            item = node[0]
+
+            if node[0][0] == "!":
+                item = node[0][1:]
+
+            self.nodes.update(item)
+
+        for item in self.model[1]:
             node = item[0].split(" | ")[0].split(" ")
 
             if node[0][0] == "!":
@@ -51,7 +48,7 @@ class Bayesian:
 
     # Method that creates the edges
     def create_edges(self):
-        for item in self.model:
+        for item in self.model[1]:
             variable = item[0].split(" | ")[0].split(" ")
 
             if variable[0][0] == "!":
@@ -74,7 +71,43 @@ class Bayesian:
     
     # Method that creates the conditional probability distributions of the network.
     def create_cpds(self):
-        for node in self.nodes:
+        for item in self.model[0]:
+            variable = item[0]
+            variable_card = 2
+            values = []
+            evidence = []
+            evidence_card = []
+
+            if variable[0] == "!":
+                values.append([item[1]])
+                values.append([1-item[1]])
+                variable = variable[1:]
+            else:
+                values.append([1-item[1]])
+                values.append([item[1]])
+
+            self.cpds.append(TabularCPD(variable=variable, variable_card=variable_card, values=values, evidence=evidence, evidence_card=evidence_card))
+            self.done.append(variable)
+
+        undone = list(set(self.nodes) - set(self.done))
+        undone = sorted(undone)
+
+        binary_decimals = []
+        for item in self.model[1]:
+            binary_str = ''
+            conditions = item[0].split(' | ')[1].split(', ')
+            
+            for condition in conditions:
+                if condition[0] == '!':
+                    binary_str += '0'
+                else:
+                    binary_str += '1'
+
+            binary_decimals.append([int(binary_str, 2),item[0], item[1]])
+
+        binary_decimals.sort(key=lambda x: x[0])
+
+        for node in undone:
             variable = node
             variable_card = 2
             values = [[],[]]
@@ -85,30 +118,17 @@ class Bayesian:
                 if edge[1] == node:
                     evidence.append(edge[0])
 
-            for item in self.model:
-                
-                if "|" in item[0]:
+            for item in binary_decimals:
+                if "|" in item[1]:
 
-                    if item[0].split(" | ")[0].split(" ")[0][1:] == node:
-                        values[0].append(item[1])
-                        values[1].append(1-item[1])
+                    if item[1].split(" | ")[0].split(" ")[0][1:] == node:
+                        values[0].append(item[2])
+                        values[1].append(1-item[2])
 
-                    elif item[0].split(" | ")[0].split(" ")[0] == node:
-                        values[0].append(1-item[1])
-                        values[1].append(item[1])
+                    elif item[1].split(" | ")[0].split(" ")[0] == node:
+                        values[0].append(1-item[2])
+                        values[1].append(item[2])
                         
-
-                elif "|" not in item[0] and len(evidence) == 0:
-
-                    if item[0][0] == "!" and item[0][1:] == node:
-                        values[0].append(item[1])
-                        values[1].append(1-item[1])
-                        break
-                    elif item[0][0] == node:
-                        values[0].append(1-item[1])
-                        values[1].append(item[1])
-                        break
-
             for var in evidence:
                 evidence_card.append(2)
 
@@ -153,13 +173,3 @@ class Bayesian:
         #use union and marginalization to get the probability of the node given the evidence
         inference = VariableElimination(self.network)
         return inference.query(variables=[node], evidence=evidence)
-
-
-
-
-
-
-
-
-
-
