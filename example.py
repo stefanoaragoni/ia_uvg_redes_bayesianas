@@ -4,17 +4,30 @@ from ia_uvg_redes_bayesianas.bayesian import Bayesian
     # [variable | evidence, probability]
     # The evidences of each list (if they exist) must be ordered alphabetically
 
-model = [
-    ['B', 0.001],
+# model = [
+#     ['B', 0.001],
+#     ['!E', 0.998],
+#     ['A | !B, !E', 0.001],
+#     ['A | B, !E', 0.94],
+#     ['!A | !B, E', 0.71],
+#     ['!A | B, E', 0.05],
+#     ['J | !A', 0.05],
+#     ['!J | A', 0.1],
+#     ['M | !A', 0.01],
+#     ['!M | A', 0.3]
+# ]
+
+model = [    
+    ['!M | A', 0.3],
     ['!E', 0.998],
+    ['B', 0.001],    
+    ['!A | B, E', 0.05],
+    ['J | !A', 0.05],
     ['A | !B, !E', 0.001],
     ['A | B, !E', 0.94],
     ['!A | !B, E', 0.71],
-    ['!A | B, E', 0.05],
-    ['J | !A', 0.05],
     ['!J | A', 0.1],
     ['M | !A', 0.01],
-    ['!M | A', 0.3]
 ]
 
 bayes = Bayesian(model)

@@ -11,8 +11,10 @@ class Bayesian:
 
     # Constructor of the class. It receives the model as a list of lists.
     def __init__(self, model):
-        self.model = model           
         model.sort(key=self.sort_modelOne)
+        self.model = model           
+
+        print(self.model)
 
         self.network = BayesianNetwork()
 
@@ -28,9 +30,10 @@ class Bayesian:
     # Method that sorts the model.
     def sort_modelOne(self, x):
         first_letter = x[0][0] if x[0][0] != '!' else x[0][1]
+        first_letter = "z" + first_letter if '|' in x[0] else first_letter
         negation = x[0].startswith('!')
-        num_negations = x[0].count('!')
-        return (first_letter, negation, -num_negations)
+
+        return (first_letter, negation)
 
     # Method that creates the nodes of the network.
     def create_nodes(self):
