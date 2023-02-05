@@ -14,8 +14,6 @@ class Bayesian:
         model.sort(key=self.sort_modelOne)
         self.model = model           
 
-        print(self.model)
-
         self.network = BayesianNetwork()
 
         self.nodes = set()
@@ -32,6 +30,10 @@ class Bayesian:
         first_letter = x[0][0] if x[0][0] != '!' else x[0][1]
         first_letter = "z" + first_letter if '|' in x[0] else first_letter
         negation = x[0].startswith('!')
+        secondNegation = x[0].split(" | ")[1][0] == "!" if '|' in x[0] else False
+
+        if negation and secondNegation:
+            return (first_letter, False)
 
         return (first_letter, negation)
 
