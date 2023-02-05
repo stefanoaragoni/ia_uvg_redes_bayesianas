@@ -1,13 +1,17 @@
 from ia_uvg_redes_bayesianas.bayesian import Bayesian
 
 #The format must be the following:
+    # [[non-CPD variables], [CPD variables]]
+
+    # The non-CPD variables must be in the following format:
     # [variable | evidence, probability]
+
+    # Please take note that any order may be used, as there is a sorting algortihm based on binary representation of the data.
 
 
 model = [
     [['B', 0.001],
     ['!E', 0.998]],
-
     [['!A | !B, E', 0.71],
     ['!M | A', 0.3],
     ['!A | B, E', 0.05],
@@ -37,4 +41,4 @@ factors = bayes.get_factors()
 for factor in factors:
     print(factor, '\n')
 
-print("\nInferencia de 'J', {'B': 1, 'E': 1}\n",bayes.get_inference('J', {'B': 1, 'E': 1}))
+print("\nInferencia de 'J', {'B': 1, 'E': 1}\n",bayes.enumeration_ask('J', {'B': 1, 'E': 1}))

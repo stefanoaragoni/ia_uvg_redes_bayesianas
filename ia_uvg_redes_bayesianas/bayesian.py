@@ -168,8 +168,7 @@ class Bayesian:
             factores.append(cpd)
         return factores
 
-    # Method that returns a probability inference of a node given the evidence.
+    # Method that returns a probability inference of a node given the evidence using enumeration.
     def get_inference(self, node, evidence):
-        #use union and marginalization to get the probability of the node given the evidence
         inference = VariableElimination(self.network)
         return inference.query(variables=[node], evidence=evidence)
