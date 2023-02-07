@@ -1,4 +1,4 @@
-from ia_uvg_redes_bayesianas.bayesian import Bayesian
+from ia_uvg_redes_bayesianas import Bayesian
 
 #The format must be the following:
     # [[non-CPD variables], [CPD variables]]

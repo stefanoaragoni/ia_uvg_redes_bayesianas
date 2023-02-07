@@ -1,2 +1,2 @@
-from .bayesian import BayesianNetwork
+from .bayesian import Bayesian
 
