@@ -41,4 +41,4 @@ factors = bayes.get_factors()
 for factor in factors:
     print(factor, '\n')
 
-print("\nInferencia de 'J', {'B': 1, 'E': 1}\n",bayes.enumeration_ask('J', {'B': 1, 'E': 1}))
+print("\nInferencia de 'J', {'B': 1, 'E': 1}\n",bayes.get_inference('J', {'B': 1, 'E': 1}))
